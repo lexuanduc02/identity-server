@@ -1,0 +1,18 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /identity
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/identitydb
+    username: food_delivery
+    password: food_delivery_dev
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
