@@ -3,42 +3,70 @@ package com.daniel.identity_service.controller;
 import com.daniel.identity_service.dto.request.UserCreationRequest;
 import com.daniel.identity_service.dto.request.UserUpdateRequest;
 import com.daniel.identity_service.dto.response.ApiResponse;
-import com.daniel.identity_service.entity.User;
+import com.daniel.identity_service.dto.response.UserDto;
 import com.daniel.identity_service.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    // 1. Dependency Inversion: Phụ thuộc vào Interface
+    UserService userService;
 
     @PostMapping
-    public User createUser(@RequestBody @Valid UserCreationRequest request) {
-        return userService.createUser(request);
+    @ResponseStatus(HttpStatus.CREATED) // 2. Trả về đúng HTTP 201 Created
+    public ApiResponse<UserDto> createUser(@RequestBody @Valid UserCreationRequest request) {
+        return ApiResponse.<UserDto>builder()
+                .code(HttpStatus.CREATED.value())
+                .message("User created successfully")
+                .data(userService.createUser(request))
+                .build();
     }
 
     @GetMapping
-    public ApiResponse<List<User>> getUsers() {
-        return userService.getUsers();
+    public ApiResponse<List<UserDto>> getUsers() {
+        return ApiResponse.<List<UserDto>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Users retrieved successfully")
+                .data(userService.getUsers())
+                .build();
     }
 
     @GetMapping("/{userId}")
-    public User getUserById(@PathVariable String userId) {
-        return userService.getUserById(userId);
+    public ApiResponse<UserDto> getUserById(@PathVariable String userId) {
+        return ApiResponse.<UserDto>builder()
+                .code(HttpStatus.OK.value())
+                .data(userService.getUserById(userId))
+                .build();
     }
 
     @PutMapping("/{userId}")
-    public User updateUser(@PathVariable String userId, @RequestBody @Valid UserUpdateRequest request) {
-        return userService.updateUser(userId, request);
+    public ApiResponse<UserDto> updateUser(
+            @PathVariable String userId,
+            @RequestBody @Valid UserUpdateRequest request) {
+        return ApiResponse.<UserDto>builder()
+                .code(HttpStatus.OK.value())
+                .message("User updated successfully")
+                .data(userService.updateUser(userId, request))
+                .build();
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable String userId) {
+    public ApiResponse<Void> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("User deleted successfully")
+                .build();
     }
 }

@@ -1,17 +1,19 @@
 package com.daniel.identity_service.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse<T> {
-    private int code = 200;
-    private String message;
-    private T data;
+public class UserDto {
+    private String id;
+    private String username;
+    private String firstName;
+    private String lastName;
+    private LocalDate dob;
 }
