@@ -2,7 +2,6 @@ package com.daniel.identity_service.service;
 
 import com.daniel.identity_service.dto.request.UserCreationRequest;
 import com.daniel.identity_service.dto.request.UserUpdateRequest;
-import com.daniel.identity_service.dto.response.ApiResponse;
 import com.daniel.identity_service.dto.response.UserDto;
 
 import java.util.List;
