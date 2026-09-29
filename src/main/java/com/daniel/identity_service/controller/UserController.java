@@ -20,11 +20,10 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
 
-    // 1. Dependency Inversion: Phụ thuộc vào Interface
     UserService userService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) // 2. Trả về đúng HTTP 201 Created
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<UserDto> createUser(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<UserDto>builder()
                 .code(HttpStatus.CREATED.value())
@@ -46,6 +45,7 @@ public class UserController {
     public ApiResponse<UserDto> getUserById(@PathVariable String userId) {
         return ApiResponse.<UserDto>builder()
                 .code(HttpStatus.OK.value())
+                .message("User retrieved successfully")
                 .data(userService.getUserById(userId))
                 .build();
     }

@@ -1,5 +1,11 @@
 package com.daniel.identity_service.exception;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@RequiredArgsConstructor
 public enum ErrorCode {
     UNCATEGORIZED_ERROR(9999, "Uncategorized error"),
     USER_EXISTS(1001, "User already exists"),
@@ -14,7 +20,9 @@ public enum ErrorCode {
     BAD_REQUEST(1010, "Bad request"),
     CONFLICT(1011, "Conflict error"),
     SERVICE_UNAVAILABLE(1012, "Service unavailable"),
-    INVALID_INPUT_FORMAT(1013, "Invalid input format"),;
+    INVALID_INPUT_FORMAT(1013, "Invalid input format"),
+    USER_NOT_EXISTS(1014, "User does not exist"),
+    USER_AUTHENTICATION_FAILED(1015, "User authentication failed"),;
 
     ErrorCode(int code, String message) {;
         this.code = code;
@@ -23,20 +31,4 @@ public enum ErrorCode {
 
     private int code;
     private String message;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }
