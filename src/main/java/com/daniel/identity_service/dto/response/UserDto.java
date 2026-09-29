@@ -11,9 +11,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {
-    private String id;
-    private String username;
-    private String firstName;
-    private String lastName;
-    private LocalDate dob;
+    String id;
+    String username;
+    String firstName;
+    String lastName;
+    LocalDate dob;
+    String[] roles;
 }

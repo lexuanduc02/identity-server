@@ -85,10 +85,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // Add payload (claims) to the token
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
-                .issuer("your-issuer")
+                .subject(user.getId())
+                .issuer("daniel.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Token valid for 1 hour
+                .claim("scope", buildScopeString(user.getRoles().toArray(new String[0])))
                 .build();
 
         Payload payload = new Payload(claimsSet.toJSONObject());
@@ -103,5 +104,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             log.error("Error signing the token", e);
             throw new RuntimeException("Error signing the token", e);
         }
+    }
+
+    private String buildScopeString(String[] scopes) {
+        StringBuilder scopeString = new StringBuilder();
+        for (String scope : scopes) {
+            scopeString.append(scope).append(" ");
+        }
+        return scopeString.toString().trim();
     }
 }
