@@ -89,7 +89,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .issuer("daniel.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Token valid for 1 hour
-                .claim("scope", buildScopeString(user.getRoles().toArray(new String[0])))
+//                .claim("scope", buildScopeString(user.getRoles().toArray(new String[0])))
                 .build();
 
         Payload payload = new Payload(claimsSet.toJSONObject());
