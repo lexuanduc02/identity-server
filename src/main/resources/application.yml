@@ -16,6 +16,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  mvc:
+    problemdetails:
+      enabled: true
 
 jwt:
   signerKey: 0b3a927a2195f5bc588b4e2b59b7fb685475f4480ed0e5376823b3aaacc1722f
