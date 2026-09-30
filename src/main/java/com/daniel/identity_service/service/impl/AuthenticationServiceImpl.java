@@ -4,6 +4,8 @@ import com.daniel.identity_service.dto.request.AuthenticationRequest;
 import com.daniel.identity_service.dto.request.IntrospectRequest;
 import com.daniel.identity_service.dto.response.AuthenticationResponse;
 import com.daniel.identity_service.dto.response.IntrospectResponse;
+import com.daniel.identity_service.entity.Permission;
+import com.daniel.identity_service.entity.Role;
 import com.daniel.identity_service.entity.User;
 import com.daniel.identity_service.exception.AppException;
 import com.daniel.identity_service.exception.ErrorCode;
@@ -25,7 +27,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -83,13 +87,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
+        // Get the user's permissions
+        List<String> permissions = new ArrayList<>();
+        for (Role role : user.getRoles()) {
+            permissions.add("ROLE_" + role.getName());
+            permissions.addAll(role.getPermissions().stream().map(Permission::getName).toList());
+        }
+
         // Add payload (claims) to the token
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getId())
                 .issuer("daniel.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Token valid for 1 hour
-//                .claim("scope", buildScopeString(user.getRoles().toArray(new String[0])))
+                .claim("scope", buildScopeString(permissions))
                 .build();
 
         Payload payload = new Payload(claimsSet.toJSONObject());
@@ -106,7 +117,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    private String buildScopeString(String[] scopes) {
+    private String buildScopeString(List<String> scopes) {
         StringBuilder scopeString = new StringBuilder();
         for (String scope : scopes) {
             scopeString.append(scope).append(" ");

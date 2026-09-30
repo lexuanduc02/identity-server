@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 
 @Data
 @Builder
@@ -16,5 +17,5 @@ public class UserDto {
     String firstName;
     String lastName;
     LocalDate dob;
-    String[] roles;
+    HashSet<RoleDto> roles;
 }

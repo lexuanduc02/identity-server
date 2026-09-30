@@ -3,10 +3,12 @@ package com.daniel.identity_service.service.impl;
 import com.daniel.identity_service.dto.request.UserCreationRequest;
 import com.daniel.identity_service.dto.request.UserUpdateRequest;
 import com.daniel.identity_service.dto.response.UserDto;
+import com.daniel.identity_service.entity.Role;
 import com.daniel.identity_service.entity.User;
 import com.daniel.identity_service.exception.AppException;
 import com.daniel.identity_service.exception.ErrorCode;
 import com.daniel.identity_service.mapper.UserMapper;
+import com.daniel.identity_service.repository.RoleRepository;
 import com.daniel.identity_service.repository.UserRepository;
 import com.daniel.identity_service.service.UserService;
 import lombok.AccessLevel;
@@ -23,6 +25,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
+    RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
@@ -32,9 +35,10 @@ public class UserServiceImpl implements UserService {
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        HashSet<String> roles = new HashSet<>();
-        roles.add("USER");
-//        user.setRoles(roles);
+        if (request.getRoles() != null && !request.getRoles().isEmpty()) {
+            List<Role> roles = roleRepository.findAllById(request.getRoles());
+            user.setRoles(new HashSet<>(roles));
+        }
 
         return userMapper.toUserDto(userRepository.save(user));
     }
@@ -55,6 +59,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         userMapper.updateUserFromRequest(existingUser, request);
+
+        existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        if (request.getRoles() != null && !request.getRoles().isEmpty()) {
+            List<Role> roles = roleRepository.findAllById(request.getRoles());
+            existingUser.setRoles(new HashSet<>(roles));
+        }
 
         return userMapper.toUserDto(userRepository.save(existingUser));
     }

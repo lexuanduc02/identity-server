@@ -1,8 +1,13 @@
 package com.daniel.identity_service.dto.request;
 
+import com.daniel.identity_service.validator.DobConstraint;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -13,9 +18,13 @@ public class UserCreationRequest {
     private String username;
 
     @Size(min = 8, message = "INVALID_INPUT_FORMAT_DD")
-    private String password;
+    String password;
+    String firstName;
+    String lastName;
 
-    private String firstName;
-    private String lastName;
-    private String dob; // Date of Birth in ISO format (YYYY-MM-DD)
+    @NotNull(message = "Dob cannot be null")
+    @DobConstraint(min = 18, message = "INVALID_DOB")
+    LocalDate dob; // Date of Birth in ISO format (YYYY-MM-DD)
+
+    List<String> roles; // List of role names
 }
