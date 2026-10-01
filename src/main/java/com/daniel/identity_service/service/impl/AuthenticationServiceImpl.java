@@ -52,10 +52,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Value("${jwt.access-token-expiration-in-ms}")
     protected long EXPIRATION_TIME;
 
-    @NonFinal
-    @Value("${jwt.refresh-token-expiration-in-ms}")
-    protected long REFRESH_EXPIRATION_TIME;
-
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         User user = userRepository.findByUsername(request.getUsername())

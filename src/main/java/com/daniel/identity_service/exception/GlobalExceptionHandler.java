@@ -16,10 +16,8 @@ import java.util.Map;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    private static final String MIN_ATTRIBUTE_KEY = "min";
-
     @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<ApiResponse<?>> handleException(RuntimeException exception) {
+    public ResponseEntity<ApiResponse<?>> handleException() {
         ErrorCode errorCode = ErrorCode.UNCATEGORIZED_ERROR;
 
         ApiResponse<?> apiResponse = ApiResponse.builder()
@@ -33,7 +31,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
-    public ResponseEntity<ApiResponse<?>> handleAccessException(AccessDeniedException exception) {
+    public ResponseEntity<ApiResponse<?>> handleAccessException() {
         ErrorCode errorCode = ErrorCode.ACCESS_DENIED;
 
         ApiResponse<?> apiResponse = ApiResponse.builder()

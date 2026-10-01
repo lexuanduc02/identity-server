@@ -33,7 +33,7 @@ public class SecurityConfig {
      */
     @Bean
     @Order(1)
-    public SecurityFilterChain publicFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain publicFilterChain(HttpSecurity httpSecurity) {
         httpSecurity
                 .securityMatchers(matchers -> {
                     if (!whitelist.getPost().isEmpty()) {
@@ -60,7 +60,7 @@ public class SecurityConfig {
      */
     @Bean
     @Order(2)
-    public SecurityFilterChain protectedFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain protectedFilterChain(HttpSecurity httpSecurity) {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
