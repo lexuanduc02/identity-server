@@ -21,7 +21,17 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      # password: ${REDIS_PASSWORD:} # Bỏ comment nếu Redis có password
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
 jwt:
   signer-key: 0b3a927a2195f5bc588b4e2b59b7fb685475f4480ed0e5376823b3aaacc1722f
   access-token-expiration-in-ms: 60000 # 1 minute (60,000 ms)
