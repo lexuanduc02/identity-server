@@ -1,9 +1,9 @@
 package com.daniel.identity_service.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,27 +20,50 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final String[] PUBLIC_ENDPOINTS = {"/auth/login", "/users", "/auth/logout", "/auth/introspect"};
 
-    @Value("${jwt.signerKey}")
-    private String signerKey;
+    private static final String[] PUBLIC_POST_ENDPOINTS = {
+            "/auth/login",
+            "/users",
+            "/auth/logout",
+            "/auth/introspect",
+            "/auth/refresh"
+    };
 
-    private CustomJwtDecoder customJwtDecoder;
+    private final CustomJwtDecoder customJwtDecoder;
 
+    // 1. Chain 1: Xử lý riêng các Endpoint công khai (bỏ qua hoàn toàn bộ lọc JWT)
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request -> request
-                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                .anyRequest().authenticated());
+    @Order(1)
+    public SecurityFilterChain publicFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .securityMatchers(matchers -> matchers
+                        .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
+                )
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().permitAll()
+                )
+                .csrf(AbstractHttpConfigurer::disable);
 
-        httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer ->
-                                jwtConfigurer.decoder(customJwtDecoder)
-                                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+        // KHÔNG cấu hình oauth2ResourceServer ở đây -> token sai/hết hạn cũng không bị chặn
+        return httpSecurity.build();
+    }
+
+    // 2. Chain 2: Xử lý toàn bộ các Request còn lại (bảo vệ bằng JWT)
+    @Bean
+    @Order(2)
+    public SecurityFilterChain protectedFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .authorizeHttpRequests(request -> request
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwtConfigurer -> jwtConfigurer
+                                .decoder(customJwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-        );
-
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+                )
+                .csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
     }

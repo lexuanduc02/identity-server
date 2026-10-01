@@ -3,6 +3,7 @@ package com.daniel.identity_service.controller;
 import com.daniel.identity_service.dto.request.AuthenticationRequest;
 import com.daniel.identity_service.dto.request.IntrospectRequest;
 import com.daniel.identity_service.dto.request.LogoutRequest;
+import com.daniel.identity_service.dto.request.RefreshTokenRequest;
 import com.daniel.identity_service.dto.response.ApiResponse;
 import com.daniel.identity_service.dto.response.AuthenticationResponse;
 import com.daniel.identity_service.dto.response.IntrospectResponse;
@@ -52,6 +53,16 @@ public class AuthenticationController {
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("User logged out successfully")
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse<AuthenticationResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest request)
+            throws ParseException, JOSEException {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .code(200)
+                .message("Token refreshed successfully")
+                .data(authenticationService.refreshToken(request))
                 .build();
     }
 }

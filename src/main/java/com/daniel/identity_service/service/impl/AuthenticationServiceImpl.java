@@ -3,6 +3,7 @@ package com.daniel.identity_service.service.impl;
 import com.daniel.identity_service.dto.request.AuthenticationRequest;
 import com.daniel.identity_service.dto.request.IntrospectRequest;
 import com.daniel.identity_service.dto.request.LogoutRequest;
+import com.daniel.identity_service.dto.request.RefreshTokenRequest;
 import com.daniel.identity_service.dto.response.AuthenticationResponse;
 import com.daniel.identity_service.dto.response.IntrospectResponse;
 import com.daniel.identity_service.entity.InvalidatedToken;
@@ -66,7 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var token = generateToken(user);
 
         return AuthenticationResponse.builder()
-                .token(token)
+                .accessToken(token)
                 .build();
     }
 
@@ -102,6 +103,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
 
         invalidatedTokenRepository.save(invalidatedToken);
+    }
+
+    @Override
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) throws JOSEException, ParseException {
+        var signedJWT = verifyToken(request.getAccessToken());
+
+        var jwtClaimsSet = signedJWT.getJWTClaimsSet();
+
+        var user = userRepository.findById(jwtClaimsSet.getSubject())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTS));
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jwtClaimsSet.getJWTID())
+                .expiresAt(jwtClaimsSet.getExpirationTime())
+                .build();
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        var token = generateToken(user);
+        return AuthenticationResponse.builder()
+                .accessToken(token)
+                .build();
     }
 
     private String generateToken(User user) {
