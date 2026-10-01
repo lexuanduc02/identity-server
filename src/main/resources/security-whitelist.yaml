@@ -1,0 +1,15 @@
+security:
+  whitelist:
+    post:
+      - /auth/login
+      - /auth/refresh
+      - /auth/introspect
+      - /auth/logout
+      - /users
+    get:
+      - /v3/api-docs/**
+      - /swagger-ui/**
+      - /swagger-ui.html
+      - /actuator/health
+    any:
+      - /public/**

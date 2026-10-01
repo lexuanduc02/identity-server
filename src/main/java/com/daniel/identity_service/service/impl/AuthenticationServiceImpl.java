@@ -45,12 +45,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
-    @Value("${jwt.signerKey}")
+    @Value("${jwt.signer-key}")
     protected String SECRET_KEY;
 
     @NonFinal
-    @Value("${jwt.expirationTime}")
+    @Value("${jwt.access-token-expiration-in-ms}")
     protected long EXPIRATION_TIME;
+
+    @NonFinal
+    @Value("${jwt.refresh-token-expiration-in-ms}")
+    protected long REFRESH_EXPIRATION_TIME;
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -142,7 +146,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .subject(user.getId())
                 .issuer("daniel.com")
                 .issueTime(new Date())
-                .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Token valid for 1 hour
+                .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .claim("scope", buildScopeString(permissions))
                 .build();
 

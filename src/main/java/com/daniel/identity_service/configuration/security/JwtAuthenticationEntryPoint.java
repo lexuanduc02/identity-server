@@ -1,4 +1,4 @@
-package com.daniel.identity_service.configuration;
+package com.daniel.identity_service.configuration.security;
 
 import com.daniel.identity_service.dto.response.ApiResponse;
 import com.daniel.identity_service.exception.ErrorCode;

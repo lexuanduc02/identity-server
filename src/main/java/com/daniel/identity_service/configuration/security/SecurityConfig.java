@@ -1,5 +1,6 @@
-package com.daniel.identity_service.configuration;
+package com.daniel.identity_service.configuration.security;
 
+import com.daniel.identity_service.configuration.security.properties.SecurityWhitelistProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,39 +22,48 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String[] PUBLIC_POST_ENDPOINTS = {
-            "/auth/login",
-            "/users",
-            "/auth/logout",
-            "/auth/introspect",
-            "/auth/refresh"
-    };
-
+    private final SecurityWhitelistProperties whitelist;
     private final CustomJwtDecoder customJwtDecoder;
 
-    // 1. Chain 1: Xử lý riêng các Endpoint công khai (bỏ qua hoàn toàn bộ lọc JWT)
+    /**
+     * CHAIN 1 (@Order(1)): Xử lý toàn bộ endpoint nằm trong Whitelist (từ file YAML).
+     * Tuyệt đối KHÔNG gắn oauth2ResourceServer ở đây để:
+     * - Bỏ qua hoàn toàn bộ lọc Bearer token.
+     * - Gửi token rác, token hết hạn vào endpoint public vẫn thành công bình thường.
+     */
     @Bean
     @Order(1)
     public SecurityFilterChain publicFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .securityMatchers(matchers -> matchers
-                        .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
-                )
+                .securityMatchers(matchers -> {
+                    if (!whitelist.getPost().isEmpty()) {
+                        matchers.requestMatchers(HttpMethod.POST, whitelist.getPost().toArray(String[]::new));
+                    }
+                    if (!whitelist.getGet().isEmpty()) {
+                        matchers.requestMatchers(HttpMethod.GET, whitelist.getGet().toArray(String[]::new));
+                    }
+                    if (!whitelist.getAny().isEmpty()) {
+                        matchers.requestMatchers(whitelist.getAny().toArray(String[]::new));
+                    }
+                })
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()
                 )
                 .csrf(AbstractHttpConfigurer::disable);
 
-        // KHÔNG cấu hình oauth2ResourceServer ở đây -> token sai/hết hạn cũng không bị chặn
         return httpSecurity.build();
     }
 
-    // 2. Chain 2: Xử lý toàn bộ các Request còn lại (bảo vệ bằng JWT)
+    /**
+     * CHAIN 2 (@Order(2)): Mặc định bảo vệ tất cả endpoint còn lại.
+     * Bắt buộc phải có Bearer Token hợp lệ, nếu không trả về 401 qua JwtAuthenticationEntryPoint.
+     */
     @Bean
     @Order(2)
     public SecurityFilterChain protectedFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .authorizeHttpRequests(request -> request
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -62,8 +72,7 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                )
-                .csrf(AbstractHttpConfigurer::disable);
+                );
 
         return httpSecurity.build();
     }

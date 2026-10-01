@@ -1,4 +1,4 @@
-package com.daniel.identity_service.configuration;
+package com.daniel.identity_service.configuration.security;
 
 import com.daniel.identity_service.dto.request.IntrospectRequest;
 import com.daniel.identity_service.dto.response.IntrospectResponse;
@@ -24,7 +24,7 @@ import java.util.Objects;
 @NullMarked
 public class CustomJwtDecoder implements JwtDecoder {
 
-    @Value("${jwt.signerKey}")
+    @Value("${jwt.signer-key}")
     private String signerKey;
 
     private final AuthenticationService authenticationService;

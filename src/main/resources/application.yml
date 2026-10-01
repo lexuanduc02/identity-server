@@ -4,6 +4,11 @@ server:
     context-path: /identity
 
 spring:
+  application:
+    name: identity-service
+  config:
+    import:
+      - optional:classpath:security-whitelist.yaml
   datasource:
     url: jdbc:postgresql://localhost:5432/identitydb
     username: food_delivery
@@ -18,5 +23,6 @@ spring:
         format_sql: true
 
 jwt:
-  signerKey: 0b3a927a2195f5bc588b4e2b59b7fb685475f4480ed0e5376823b3aaacc1722f
-  expirationTime: 3600000 # 1 hour in milliseconds
+  signer-key: 0b3a927a2195f5bc588b4e2b59b7fb685475f4480ed0e5376823b3aaacc1722f
+  access-token-expiration-in-ms: 60000 # 1 minute (60,000 ms)
+  refresh-token-expiration-in-ms: 604800000 # 7 days (604,800,000 ms)
