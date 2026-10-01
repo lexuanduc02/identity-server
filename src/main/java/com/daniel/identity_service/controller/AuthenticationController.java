@@ -2,11 +2,13 @@ package com.daniel.identity_service.controller;
 
 import com.daniel.identity_service.dto.request.AuthenticationRequest;
 import com.daniel.identity_service.dto.request.IntrospectRequest;
+import com.daniel.identity_service.dto.request.LogoutRequest;
 import com.daniel.identity_service.dto.response.ApiResponse;
 import com.daniel.identity_service.dto.response.AuthenticationResponse;
 import com.daniel.identity_service.dto.response.IntrospectResponse;
 import com.daniel.identity_service.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -40,6 +42,16 @@ public class AuthenticationController {
                 .code(200)
                 .message("Token introspected successfully")
                 .data(authenticationService.introspect(request))
+                .build();
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestBody @Valid LogoutRequest request)
+            throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("User logged out successfully")
                 .build();
     }
 }

@@ -32,7 +32,8 @@ public enum ErrorCode {
     // Validation Errors
     INVALID_KEY(1009, "Invalid key", HttpStatus.BAD_REQUEST),
     DOB_REQUIRED(1010, "Date of birth is required", HttpStatus.BAD_REQUEST),
-    INVALID_DOB(1011, "Your age must be at least {min}", HttpStatus.BAD_REQUEST);;
+    INVALID_DOB(1011, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
+    INVALID_PASSWORD(1012, "Password must be at least {min} and at most {max} characters long", HttpStatus.BAD_REQUEST);
 
     int code;
     String message;

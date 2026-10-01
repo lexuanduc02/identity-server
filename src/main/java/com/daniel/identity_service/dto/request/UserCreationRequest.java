@@ -17,13 +17,13 @@ import java.util.List;
 public class UserCreationRequest {
     private String username;
 
-    @Size(min = 8, message = "INVALID_INPUT_FORMAT_DD")
+    @Size(min = 8, max = 255, message = "INVALID_PASSWORD")
     String password;
     String firstName;
     String lastName;
 
     @NotNull(message = "Dob cannot be null")
-    @DobConstraint(min = 18, message = "INVALID_DOB")
+    @DobConstraint(min = 15, message = "INVALID_DOB")
     LocalDate dob; // Date of Birth in ISO format (YYYY-MM-DD)
 
     List<String> roles; // List of role names
