@@ -25,7 +25,7 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
-      # password: ${REDIS_PASSWORD:} # Bỏ comment nếu Redis có password
+      password: ${REDIS_PASSWORD:123456789@}
       timeout: 2000ms
       lettuce:
         pool:

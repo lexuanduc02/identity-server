@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:lastest
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: food_delivery
+      POSTGRES_PASSWORD: food_delivery_dev
+      POSTGRES_DB: identitydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - food-delivery-network
+
+  redis:
+    image: redis:lastest
+    container_name: redis-cache
+    restart: always
+    command: redis-server --requirepass "123456789@"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - food-delivery-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  food-delivery-network:
+    driver: bridge
